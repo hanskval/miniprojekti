@@ -10,7 +10,7 @@ spec:
     - name: latest
       from:
         kind: DockerImage
-        name: dockerhub-image:latest
+        name: source-image:latest
       importPolicy:
         scheduled: true
       referencePolicy:
