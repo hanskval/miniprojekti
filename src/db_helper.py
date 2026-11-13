@@ -2,6 +2,10 @@ from config import db, app
 from sqlalchemy import text
 import os
 
+def init_db_if_needed():
+    if "todos" not in tables():
+        setup_db()
+
 def reset_db():
   print(f"Clearing contents from table todos")
   sql = text(f"DELETE FROM todos")
