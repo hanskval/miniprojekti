@@ -4,4 +4,5 @@
 4. 
 
 Tärkeät komennot:
-+ git pull origin <branch-name>
++ git fetch origin <branch-name>
++ git checkout <branch-name>
