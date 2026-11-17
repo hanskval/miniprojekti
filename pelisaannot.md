@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 1. Poissaoloista ja myöhästymisistä ilmoitetaan etukäteen.
 2. Katsotaan Discordia aktiivisesti viestien varalta.
 3. Tyhmiä kysymyksiä ei ole, voi kysyä ongelmista.
@@ -11,6 +10,3 @@ tai
 + git pull origin <branch-name>
 
 + git checkout <branch-name>
-=======
-Yabadabadoo
->>>>>>> 52eaf2a (Test)
