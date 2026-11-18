@@ -9,8 +9,18 @@ body %}
   {% endfor %}
 </ul>
 
-<div>
-  <a href="/new_citation">Create new citation</a>
-</div>
+<p>
+  {{ test }}
+</p>
+<p>
+  <div>
+    <a href="/new_citation">Create new citation</a>
+  </div>
+</p>
 
+<p>
+  <div>
+    <a href="{{ url_for('make_bibtex') }}">Download all citations</a>
+  </div>
+</p>
 {% endblock %}

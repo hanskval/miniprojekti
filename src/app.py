@@ -1,4 +1,5 @@
-from flask import redirect, render_template, request, jsonify, flash
+from flask import Response, redirect, render_template, request, jsonify, flash
+from repositories import bib
 from db_helper import reset_db
 from repositories.todo_repository import get_todos, create_todo, set_done
 from config import app, test_env
@@ -13,6 +14,17 @@ with app.app_context():
 @app.route("/")
 def index():
     return render_template("index.html", citations=citations.get_citations())
+
+@app.route("/make_bibtex")
+def make_bibtex():
+    entries = bib.bibfile(citations.get_citations())
+
+    return Response(
+            "\n\n".join(entries) + ("\n" if entries else ""),
+            mimetype="application/x-bibtex",
+            headers={"Content-Disposition": 'attachment; filename="citations.bib"'},
+        )
+    
 
 @app.route("/new_citation")
 def new():
