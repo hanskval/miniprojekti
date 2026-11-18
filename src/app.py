@@ -12,9 +12,7 @@ with app.app_context():
 
 @app.route("/")
 def index():
-    todos = get_todos()
-    unfinished = len([todo for todo in todos if not todo.done])
-    return render_template("index.html", todos=todos, unfinished=unfinished) 
+    return render_template("index.html", citations=citations.get_citations())
 
 @app.route("/new_citation")
 def new():
@@ -48,22 +46,7 @@ def book_citation_creation():
     )
     return redirect("/") # tää myöhemmi nii et siirtää siihe kirjaan tai listaan yms citationiin eikä etusivulle
 
-@app.route("/create_todo", methods=["POST"])
-def todo_creation():
-    content = request.form.get("content")
 
-    try:
-        validate_todo(content)
-        create_todo(content)
-        return redirect("/")
-    except Exception as error:
-        flash(str(error))
-        return  redirect("/new_todo")
-
-@app.route("/toggle_todo/<todo_id>", methods=["POST"])
-def toggle_todo(todo_id):
-    set_done(todo_id)
-    return redirect("/")
 
 # testausta varten oleva reitti
 if test_env:
