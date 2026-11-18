@@ -18,3 +18,7 @@ def create_book_citation(citation_type, author, title, year, publisher):
         },
     )
     db.session.commit()
+
+def get_citations():
+    sql = text("SELECT id, type, author, title, year, publisher FROM citations ORDER BY id")
+    return db.session.execute(sql).fetchall()

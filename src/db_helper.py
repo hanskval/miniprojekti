@@ -3,12 +3,12 @@ from sqlalchemy import text
 import os
 
 def init_db_if_needed():
-    if "todos" not in tables():
+    if "citations" not in tables():
         setup_db()
 
 def reset_db():
-  print(f"Clearing contents from table todos")
-  sql = text(f"DELETE FROM todos")
+  print(f"Clearing contents from table citations")
+  sql = text(f"DELETE FROM citations")
   db.session.execute(sql)
   db.session.commit()
 
