@@ -1,5 +1,5 @@
 # Miniprojekti lähdesovellukseen
-Backlog: https://github.com/users/hanskval/projects/4/views/1
+Backlog: https://github.com/users/hanskval/projects/1
 Sprint 1: https://github.com/users/hanskval/projects/4/views/2
 OKD-klusteri: https://route-ohjelmistotuotanto-lahiopetus-2026-17.ext.okd-cs-test-0.k8s.cs.helsinki.fi/
 
