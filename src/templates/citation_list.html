@@ -1,0 +1,48 @@
+{% extends "layout.html" %} {% block title %} Citation {% endblock %} {% block
+body %}
+
+<h2>Citation list</h2>
+
+
+<table id="citation_list">
+    <caption>Click the citation title to download a citation in BibTeX format separately.</caption>
+    <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Year</th>
+        <th>Publisher</th>
+    </tr>
+    {% for c in citations %}
+    <tr>
+        <td><a href="{{ url_for('make_bib', citation_id=c.id) }}">{{ c.title }}</a></td>
+        <td>{{ c.author }}</td>
+        <td>{{ c.year }}</td>
+        <td>{{ c.publisher }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<p>
+  <div id="new_citation_button">
+    <a href="/new_citation">Create new citation</a>
+  </div>
+</p>
+
+<p>
+  <div id="download_all_citations_button">
+    <a href="{{ url_for('make_bibtex') }}">Download all citations</a>
+  </div>
+</p>
+
+<p>
+  <div id="home_button">
+    <a href="/">Return home</a>
+  </div>
+</p>
+
+<p>
+  <div id="reset_button">
+    <a href="/reset_db">Reset database</a>
+  </div>
+</p>
+{% endblock %}

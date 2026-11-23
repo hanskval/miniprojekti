@@ -23,7 +23,15 @@ def get_citations():
     sql = text("SELECT id, type, author, title, year, publisher FROM citations ORDER BY id")
     return db.session.execute(sql).fetchall()
 
+def get_citation(citation_id):
+    sql = text(
+        "SELECT id, type, author, title, year, publisher "
+        "FROM citations WHERE id = :id"
+    )
+    return db.session.execute(sql, {"id": citation_id}).fetchone()
+
 def get_column_names():
     sql = text("PRAGMA table_info(citations)")
     result = db.session.execute(sql).fetchall()
     return [row[1] for row in result]
+
