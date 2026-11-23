@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Create a new todo
+Create a new citation
 {% endblock %}
 
 {% block body %}
@@ -19,6 +19,7 @@ Create a new todo
     {% endif %}
   {% endwith %}
 
+  <!--
   {% for column in columns %}
   <p>
     <label for="{{ column.name }}">{{ column.name|title }}:</label>
@@ -31,6 +32,7 @@ Create a new todo
     {% endif %}
   </p>
   {% endfor %}
+  -->
 
   <button type="submit">
     Create

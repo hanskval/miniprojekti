@@ -56,7 +56,7 @@ def make_bib(citation_id):
 def new():
     return render_template(
         "new_citation.html",
-        columns=citations.get_column_metadata(),
+        # columns=citations.get_column_metadata(),
     )
 
 @app.route("/create_citation", methods=["POST"])
