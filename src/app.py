@@ -12,7 +12,11 @@ with app.app_context():
 
 @app.route("/")
 def index():
-    return render_template("index.html", citations=citations.get_citations())
+    return render_template(
+        "index.html",
+        citations=citations.get_citations(),
+        columns=[name for name in citations.get_column_names() if name not in ("id", "type")],
+    )
 
 @app.route("/make_bibtex")
 def make_bibtex():
@@ -26,7 +30,11 @@ def make_bibtex():
 
 @app.route("/citation_list")
 def citation_list():
-    return render_template("citation_list.html", citations=citations.get_citations())
+    return render_template(
+        "citation_list.html",
+        citations=citations.get_citations(),
+        columns=[name for name in citations.get_column_names() if name not in ("id", "type")],
+    )
 
 @app.route("/make_bib/<int:citation_id>")
 def make_bib(citation_id):
@@ -46,35 +54,20 @@ def make_bib(citation_id):
 
 @app.route("/new_citation")
 def new():
-    return render_template("new_citation.html")
-
-@app.route("/create_book_citation", methods=["POST"])
-def book_citation_creation():
-    fields = ("type", "author", "title", "year", "publisher")
-    citation = {field: request.form.get(field, "").strip() for field in fields}
-
-    if not all(citation.values()):
-        flash("All fields are required.")
-        return redirect("/new_citation")
-
-    if citation["type"] != "book":
-        flash("Unsupported citation type.")
-        return redirect("/new_citation")
-
-    try:
-        year = int(citation["year"])
-    except ValueError:
-        flash("Year must be a number.")
-        return redirect("/new_citation")
-
-    citations.create_book_citation(
-        citation["type"],
-        citation["author"],
-        citation["title"],
-        year,
-        citation["publisher"],
+    return render_template(
+        "new_citation.html",
+        columns=citations.get_column_metadata(),
     )
-    return redirect("/citation_list") # tää myöhemmi nii et siirtää siihe kirjaan tai listaan yms citationiin eikä etusivulle
+
+@app.route("/create_citation", methods=["POST"])
+def create_citation():
+    citation = request.form.to_dict(flat=True)
+    try:
+        citations.create_citation(citation)
+    except ValueError as exc:
+        flash(str(exc))
+        return redirect("/new_citation")
+    return redirect("/citation_list")
 
 @app.route("/reset_db")
 def reset_db_route():

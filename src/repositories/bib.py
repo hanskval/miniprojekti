@@ -20,13 +20,24 @@ def safe_bib(text):
     return text
 
 def bibfile(entries):
-    return [
-        f"@{citation.type}{{citation{citation.id},\n"
-        f"  author = {{{safe_bib(citation.author)}}},\n"
-        f"  title = {{{safe_bib(citation.title)}}},\n"
-        f"  year = {{{citation.year}}},\n"
-        f"  publisher = {{{safe_bib(citation.publisher)}}}\n"
-        f"}}"
-        for citation in entries
-    ]
+    output = []
+    for citation in entries:
+        values = citation._mapping if hasattr(citation, "_mapping") else citation
+        citation_type = values["type"] if "type" in values else "misc"
+        fields = []
+        for name in values.keys():
+            if name in ("id", "type"):
+                continue
+            value = values[name]
+            if value is not None and str(value).strip():
+                fields.append(
+                    f"  {name} = {{{safe_bib(str(value))}}}"
+                )
+        body = ",\n".join(fields)
+        output.append(
+            f"@{citation_type}{{citation{values['id']},\n"
+            f"{body}\n"
+            f"}}"
+        )
+    return output
     

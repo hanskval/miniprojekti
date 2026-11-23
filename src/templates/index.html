@@ -5,7 +5,11 @@ body %}
 
 <ul>
   {% for c in citations %}
-  <li>{{ c.author }}: {{ c.title }} ({{ c.year }}), {{ c.publisher }}</li>
+  <li>
+    {% for name in columns %}
+      {% if not loop.first %} / {% endif %}{{ c[name] }}
+    {% endfor %}
+  </li>
   {% endfor %}
 </ul>
 

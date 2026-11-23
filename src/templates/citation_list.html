@@ -7,17 +7,21 @@ body %}
 <table id="citation_list">
     <caption>Click the citation title to download a citation in BibTeX format separately.</caption>
     <tr>
-        <th>Title</th>
-        <th>Author</th>
-        <th>Year</th>
-        <th>Publisher</th>
+        {% for name in columns %}
+        <th>{{ name|title }}</th>
+        {% endfor %}
     </tr>
     {% for c in citations %}
     <tr>
-        <td><a href="{{ url_for('make_bib', citation_id=c.id) }}">{{ c.title }}</a></td>
-        <td>{{ c.author }}</td>
-        <td>{{ c.year }}</td>
-        <td>{{ c.publisher }}</td>
+        {% for name in columns %}
+        <td>
+            {% if name == "title" %}
+            <a href="{{ url_for('make_bib', citation_id=c.id) }}">{{ c[name] }}</a>
+            {% else %}
+            {{ c[name] }}
+            {% endif %}
+        </td>
+        {% endfor %}
     </tr>
     {% endfor %}
 </table>
