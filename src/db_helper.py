@@ -1,10 +1,60 @@
-from config import db, app
-from sqlalchemy import text
 import os
+
+from sqlalchemy import text
+
+from config import db, app
 
 def init_db_if_needed():
     if "citations" not in tables():
         setup_db()
+    elif not {
+        "journal", "volume", "issue", "pages", "month", "note"
+    }.issubset(citation_columns()):
+        migrate_citations()
+
+
+def citation_columns():
+    rows = db.session.execute(text("PRAGMA table_info(citations)")).fetchall()
+    return {row[1] for row in rows}
+
+
+def migrate_citations():
+    old_columns = citation_columns()
+    selected_columns = ["id", "type", "title", "author", "year"]
+    for name in ("publisher", "journal", "volume"):
+        selected_columns.append(
+            f'"{name}"' if name in old_columns else f"NULL AS {name}"
+        )
+    if "issue" in old_columns:
+        selected_columns.append('"issue"')
+    elif "number" in old_columns:
+        selected_columns.append('"number" AS issue')
+    else:
+        selected_columns.append("NULL AS issue")
+    for name in ("pages", "month", "note"):
+        selected_columns.append(
+            f'"{name}"' if name in old_columns else f"NULL AS {name}"
+        )
+
+    schema_path = os.path.join(os.path.dirname(__file__), "schema.sql")
+    with open(schema_path, "r", encoding="utf-8") as schema_file:
+        schema_sql = schema_file.read().strip()
+    new_schema = schema_sql.replace(
+        "CREATE TABLE citations", "CREATE TABLE citations_new", 1
+    )
+
+    db.session.execute(text(new_schema))
+    db.session.execute(
+        text(
+            "INSERT INTO citations_new "
+            "(id, type, title, author, year, publisher, journal, volume, issue, "
+            "pages, month, note) "
+            "SELECT " + ", ".join(selected_columns) + " FROM citations"
+        )
+    )
+    db.session.execute(text("DROP TABLE citations"))
+    db.session.execute(text("ALTER TABLE citations_new RENAME TO citations"))
+    db.session.commit()
 
 def reset_db():
   print(f"Clearing contents from table citations")

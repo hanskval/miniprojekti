@@ -8,36 +8,91 @@ Create a new citation
 
 <h2>Create a new citation</h2>
 
-<form action="/create_citation" method="post">
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul>
-      {% for message in messages %}
-        <li>{{ message }}</li>
-      {% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %}
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
 
-  <!--
-  {% for column in columns %}
-  <p>
-    <label for="{{ column.name }}">{{ column.name|title }}:</label>
-    {% if column.type == "INTEGER" %}
-      <input type="number" name="{{ column.name }}" id="{{ column.name }}"
-             {% if column.required %}required{% endif %}>
-    {% else %}
-      <input type="text" name="{{ column.name }}" id="{{ column.name }}"
-             {% if column.required %}required{% endif %}>
-    {% endif %}
-  </p>
-  {% endfor %}
-  -->
+<details name="citation-form" open>
+  <summary>Book citation</summary>
+  <form action="/create_citation" method="post">
+    <input type="hidden" name="type" value="book">
+    <p>
+      <label for="book-title">Title:</label>
+      <input type="text" name="title" id="book-title" required>
+    </p>
+    <p>
+      <label for="book-author">Author:</label>
+      <input type="text" name="author" id="book-author" required>
+    </p>
+    <p>
+      <label for="book-year">Year:</label>
+      <input type="number" name="year" id="book-year" required>
+    </p>
+    <p>
+      <label for="book-publisher">Publisher:</label>
+      <input type="text" name="publisher" id="book-publisher" required>
+    </p>
+    <p>
+      <label for="book-month">Month (optional):</label>
+      <input type="text" name="month" id="book-month">
+    </p>
+    <p>
+      <label for="book-note">Note (optional):</label>
+      <input type="text" name="note" id="book-note">
+    </p>
+    <button type="submit">Create</button>
+  </form>
+</details>
 
-  <button type="submit">
-    Create
-  </button>
-</form>
+<details name="citation-form">
+  <summary>Article citation</summary>
+  <form action="/create_citation" method="post">
+    <input type="hidden" name="type" value="article">
+    <p>
+      <label for="article-title">Title:</label>
+      <input type="text" name="title" id="article-title" required>
+    </p>
+    <p>
+      <label for="article-author">Author:</label>
+      <input type="text" name="author" id="article-author" required>
+    </p>
+    <p>
+      <label for="article-year">Year:</label>
+      <input type="number" name="year" id="article-year" required>
+    </p>
+    <p>
+      <label for="article-journal">Journal:</label>
+      <input type="text" name="journal" id="article-journal" required>
+    </p>
+    <p>
+      <label for="article-volume">Volume:</label>
+      <input type="text" name="volume" id="article-volume" required>
+    </p>
+    <p>
+      <label for="article-issue">Issue:</label>
+      <input type="text" name="issue" id="article-issue" required>
+    </p>
+    <p>
+      <label for="article-pages">Pages:</label>
+      <input type="text" name="pages" id="article-pages" required>
+    </p>
+    <p>
+      <label for="article-month">Month (optional):</label>
+      <input type="text" name="month" id="article-month">
+    </p>
+    <p>
+      <label for="article-note">Note (optional):</label>
+      <input type="text" name="note" id="article-note">
+    </p>
+    <button type="submit">Create</button>
+  </form>
+</details>
 
 <div>
   <p>

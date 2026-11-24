@@ -29,6 +29,15 @@ After adding a book citation, citation table exists and has one citation
     Should Be Equal As Integers  ${rows}  2
     Go To  ${RESET_URL}
 
+After adding an article citation, its fields are shown when filtered
+    Create Article Citation
+    Go To  ${DATA_URL}?type=article
+    Get Text  body  *=  A Journal
+    Get Text  body  *=  20-30
+    Get Text  css=#citation_list tr:first-child th:nth-child(1)  ==  Title
+    Get Text  css=#citation_list tr:first-child th:nth-child(4)  ==  Journal
+    Go To  ${RESET_URL}
+
 Citation table has correct headers and four columns
     Go To  ${DATA_URL}
     ${columns}=  Get Element Count  css=#citation_list tr:first-child th
@@ -56,11 +65,24 @@ Home button exists
 Create Book Citation
     Go To  ${HOME_URL}
     Click  text=Create new citation
-    Fill Text  [name="author"]     Matti Meikäläinen
-    Fill Text  [name="title"]      Ohjelmistotuotanto
-    Fill Text  [name="year"]       2026
-    Fill Text  [name="publisher"]  Gaudeamus
-    Click  button >> text=Create
+    Fill Text  css=#book-author     Matti Meikäläinen
+    Fill Text  css=#book-title      Ohjelmistotuotanto
+    Fill Text  css=#book-year       2026
+    Fill Text  css=#book-publisher  Gaudeamus
+    Click  css=details[open] button
+
+Create Article Citation
+    Go To  ${HOME_URL}
+    Click  text=Create new citation
+    Click  text=Article citation
+    Fill Text  css=#article-author   A Writer
+    Fill Text  css=#article-title    An Article
+    Fill Text  css=#article-year     2025
+    Fill Text  css=#article-journal  A Journal
+    Fill Text  css=#article-volume   12
+    Fill Text  css=#article-issue    3
+    Fill Text  css=#article-pages    20-30
+    Click  css=details[open] button
 
 Table Should Have Headers
     Get Text  css=#citation_list tr:first-child th:nth-child(1)  ==  Title

@@ -30,8 +30,9 @@ def bibfile(entries):
                 continue
             value = values[name]
             if value is not None and str(value).strip():
+                bib_name = "number" if name == "issue" else name
                 fields.append(
-                    f"  {name} = {{{safe_bib(str(value))}}}"
+                    f"  {bib_name} = {{{safe_bib(str(value))}}}"
                 )
         body = ",\n".join(fields)
         output.append(

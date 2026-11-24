@@ -1,6 +1,13 @@
 from config import db
 from sqlalchemy import text
-import re
+
+
+COMMON_FIELDS = ("title", "author", "year")
+OPTIONAL_FIELDS = ("month", "note")
+CITATION_FIELDS = {
+    "book": ("publisher",),
+    "article": ("journal", "volume", "issue", "pages"),
+}
 
 
 def get_column_metadata():
@@ -21,40 +28,34 @@ def get_column_names():
 
 
 def create_citation(data):
-    columns = get_column_metadata()
-    allowed = {column["name"]: column for column in columns}
-    citation = {}
+    citation_type = str(data.get("type", "")).strip().lower()
+    if citation_type not in CITATION_FIELDS:
+        raise ValueError("Citation type must be book or article.")
 
-    for name, column in allowed.items():
-        if name not in data:
-            if name == "type":
-                citation[name] = "misc"
-                continue
-            if column["required"]:
-                raise ValueError(f"{name} is required.")
-            continue
+    fields = (*COMMON_FIELDS, *CITATION_FIELDS[citation_type], *OPTIONAL_FIELDS)
+    unexpected_fields = {
+        name for name, value in data.items()
+        if name not in {"type", *fields} and str(value).strip()
+    }
+    if unexpected_fields:
+        raise ValueError("The submitted fields do not match the citation type.")
 
-        value = str(data[name]).strip()
+    citation = {"type": citation_type}
+    for name in (*COMMON_FIELDS, *CITATION_FIELDS[citation_type]):
+        value = str(data.get(name, "")).strip()
         if not value:
-            if name == "type":
-                citation[name] = "misc"
-                continue
-            if column["required"]:
-                raise ValueError(f"{name} is required.")
-            continue
-
-        if "INT" in column["type"]:
+            raise ValueError(f"{name} is required.")
+        if name == "year":
             try:
                 value = int(value)
             except ValueError as exc:
-                raise ValueError(f"{name} must be a number.") from exc
-
-        if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
-            raise ValueError("Invalid citation field.")
+                raise ValueError("year must be a number.") from exc
         citation[name] = value
 
-    if not citation:
-        raise ValueError("At least one citation field is required.")
+    for name in OPTIONAL_FIELDS:
+        value = str(data.get(name, "")).strip()
+        if value:
+            citation[name] = value
 
     names = ", ".join(f'"{name}"' for name in citation)
     placeholders = ", ".join(f":{name}" for name in citation)
@@ -74,23 +75,32 @@ def create_book_citation(citation_type, author, title, year, publisher):
         "publisher": publisher,
     })
 
+
+def _select_citations(where_clause="", parameters=None):
+    names_with_id = ["id", *get_column_names()]
+    sql = "SELECT " + ", ".join(f'"{name}"' for name in names_with_id)
+    sql += " FROM citations"
+    if where_clause:
+        sql += " WHERE " + where_clause
+    sql += " ORDER BY id"
+    return db.session.execute(text(sql), parameters or {}).fetchall()
+
+
 def get_citations():
-    names = get_column_names()
-    names_with_id = ["id", *names]
-    sql = text(
-        "SELECT " +
-        ", ".join(f'"{name}"' for name in names_with_id) +
-        " FROM citations ORDER BY id"
-    )
-    return db.session.execute(sql).fetchall()
+    return _select_citations()
+
+
+def get_citations_by_type(citation_type):
+    if citation_type not in CITATION_FIELDS:
+        raise ValueError("Citation type must be book or article.")
+    return _select_citations("type = :type", {"type": citation_type})
+
 
 def get_citation(citation_id):
-    names = get_column_names()
-    names_with_id = ["id", *names]
+    names_with_id = ["id", *get_column_names()]
     sql = text(
         "SELECT " +
         ", ".join(f'"{name}"' for name in names_with_id) +
         " FROM citations WHERE id = :id"
     )
     return db.session.execute(sql, {"id": citation_id}).fetchone()
-

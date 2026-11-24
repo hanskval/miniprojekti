@@ -1,4 +1,4 @@
-from flask import Response, redirect, render_template, request, jsonify, flash
+from flask import Response, redirect, render_template, request, jsonify, flash, abort
 from repositories import bib
 from repositories.todo_repository import get_todos, create_todo, set_done
 from config import app, test_env
@@ -15,7 +15,7 @@ def index():
     return render_template(
         "index.html",
         citations=citations.get_citations(),
-        columns=[name for name in citations.get_column_names() if name not in ("id", "type")],
+        columns=["title", "author", "year", "type"],
     )
 
 @app.route("/make_bibtex")
@@ -30,10 +30,38 @@ def make_bibtex():
 
 @app.route("/citation_list")
 def citation_list():
+    citation_type = request.args.get("type") or None
+    if citation_type is not None and citation_type not in citations.CITATION_FIELDS:
+        abort(400)
+
+    entries = (
+        citations.get_citations_by_type(citation_type)
+        if citation_type
+        else citations.get_citations()
+    )
+    types = {entry.type for entry in entries}
+    display_types = types or ({citation_type} if citation_type else {"book"})
+    columns = ["title", "author", "year"]
+    if citation_type is None and (
+        len(types) > 1
+        or any(
+            entry_type not in citations.CITATION_FIELDS for entry_type in types
+        )
+    ):
+        columns.insert(0, "type")
+    if "book" in display_types or any(entry.publisher for entry in entries):
+        columns.append("publisher")
+    if "article" in display_types or any(entry.journal for entry in entries):
+        columns.extend(("journal", "volume", "issue", "pages"))
+    for optional_field in ("month", "note"):
+        if any(getattr(entry, optional_field) for entry in entries):
+            columns.append(optional_field)
+
     return render_template(
         "citation_list.html",
-        citations=citations.get_citations(),
-        columns=[name for name in citations.get_column_names() if name not in ("id", "type")],
+        citations=entries,
+        columns=columns,
+        citation_type=citation_type,
     )
 
 @app.route("/make_bib/<int:citation_id>")

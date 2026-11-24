@@ -4,5 +4,11 @@ CREATE TABLE citations (
   title TEXT NOT NULL,
   author TEXT NOT NULL,
   year INTEGER NOT NULL,
-  publisher TEXT NOT NULL
+  publisher TEXT,
+  journal TEXT,
+  volume TEXT,
+  issue TEXT,
+  pages TEXT,
+  month TEXT,
+  note TEXT
 );
