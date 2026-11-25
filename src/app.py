@@ -50,8 +50,15 @@ def citation_list():
         columns.append("publisher")
     if "article" in display_types or any(entry.journal for entry in entries):
         columns.extend(("journal", "volume", "issue", "pages"))
-    for optional_field in ("month", "note"):
-        if any(getattr(entry, optional_field) for entry in entries):
+    if "inproceedings" in display_types:
+        columns.append("booktitle")
+    for optional_field in (
+        "editor", "volume", "issue", "series", "pages", "address",
+        "organization", "month", "note"
+    ):
+        if optional_field not in columns and any(
+            getattr(entry, optional_field) for entry in entries
+        ):
             columns.append(optional_field)
 
     return render_template(

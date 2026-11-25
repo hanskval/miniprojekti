@@ -10,5 +10,10 @@ CREATE TABLE citations (
   issue TEXT,
   pages TEXT,
   month TEXT,
-  note TEXT
+  note TEXT,
+  booktitle TEXT,
+  editor TEXT,
+  series TEXT,
+  address TEXT,
+  organization TEXT
 );

@@ -10,6 +10,8 @@ body %}
        {% if citation_type == "book" %}aria-current="page"{% endif %}>Books</a>
     <a href="{{ url_for('citation_list', type='article') }}"
        {% if citation_type == "article" %}aria-current="page"{% endif %}>Articles</a>
+    <a href="{{ url_for('citation_list', type='inproceedings') }}"
+       {% if citation_type == "inproceedings" %}aria-current="page"{% endif %}>Inproceedings</a>
 </nav>
 
 <table id="citation_list">

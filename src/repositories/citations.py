@@ -8,7 +8,12 @@ OPTIONAL_FIELDS = ("month", "note")
 CITATION_FIELDS = {
     "book": ("publisher",),
     "article": ("journal", "volume", "issue", "pages"),
+    "inproceedings": ("booktitle",),
 }
+INPROCEEDINGS_OPTIONAL_FIELDS = (
+    "editor", "volume", "issue", "series", "pages", "address",
+    "organization", "publisher",
+)
 
 
 def get_column_metadata():
@@ -31,9 +36,12 @@ def get_column_names():
 def create_citation(data):
     citation_type = str(data.get("type", "")).strip().lower()
     if citation_type not in CITATION_FIELDS:
-        raise ValueError("Citation type must be book or article.")
+        raise ValueError("Citation type must be book, article or inproceedings.")
 
-    fields = (*COMMON_FIELDS, *CITATION_FIELDS[citation_type], *OPTIONAL_FIELDS)
+    optional_fields = OPTIONAL_FIELDS
+    if citation_type == "inproceedings":
+        optional_fields = (*INPROCEEDINGS_OPTIONAL_FIELDS, *OPTIONAL_FIELDS)
+    fields = (*COMMON_FIELDS, *CITATION_FIELDS[citation_type], *optional_fields)
     unexpected_fields = {
         name for name, value in data.items()
         if name not in {"type", *fields} and str(value).strip()
@@ -53,7 +61,7 @@ def create_citation(data):
                 raise ValueError("year must be a number.") from exc
         citation[name] = value
 
-    for name in OPTIONAL_FIELDS:
+    for name in optional_fields:
         value = str(data.get(name, "")).strip()
         if value:
             citation[name] = value
@@ -93,7 +101,7 @@ def get_citations():
 
 def get_citations_by_type(citation_type):
     if citation_type not in CITATION_FIELDS:
-        raise ValueError("Citation type must be book or article.")
+        raise ValueError("Citation type must be book, article or inproceedings.")
     return _select_citations("type = :type", {"type": citation_type})
 
 

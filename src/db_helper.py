@@ -8,7 +8,8 @@ def init_db_if_needed():
     if "citations" not in tables():
         setup_db()
     elif not {
-        "journal", "volume", "issue", "pages", "month", "note"
+        "journal", "volume", "issue", "pages", "month", "note",
+        "booktitle", "editor", "series", "address", "organization"
     }.issubset(citation_columns()):
         migrate_citations()
 
@@ -31,7 +32,10 @@ def migrate_citations():
         selected_columns.append('"number" AS issue')
     else:
         selected_columns.append("NULL AS issue")
-    for name in ("pages", "month", "note"):
+    for name in (
+        "pages", "month", "note", "booktitle", "editor", "series",
+        "address", "organization"
+    ):
         selected_columns.append(
             f'"{name}"' if name in old_columns else f"NULL AS {name}"
         )
@@ -48,7 +52,7 @@ def migrate_citations():
         text(
             "INSERT INTO citations_new "
             "(id, type, title, author, year, publisher, journal, volume, issue, "
-            "pages, month, note) "
+            "pages, month, note, booktitle, editor, series, address, organization) "
             "SELECT " + ", ".join(selected_columns) + " FROM citations"
         )
     )
