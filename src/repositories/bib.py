@@ -1,7 +1,3 @@
-from repositories import citations
-from flask import Response
-from config import app
-
 def safe_bib(text):
     unsafe_chars = {
         '\\': r'\\textbackslash{}',
@@ -22,7 +18,7 @@ def safe_bib(text):
 def bibfile(entries):
     output = []
     for citation in entries:
-        values = citation._mapping if hasattr(citation, "_mapping") else citation
+        values = citation._asdict() if hasattr(citation, "_asdict") else citation
         citation_type = values["type"] if "type" in values else "misc"
         fields = []
         for name in values.keys():
@@ -41,4 +37,3 @@ def bibfile(entries):
             f"}}"
         )
     return output
-    
