@@ -70,6 +70,17 @@ After adding an inproceedings citation, its fields are shown when filtered
     Should Be Equal As Integers  ${rows}  2
     Go To  ${RESET_URL}
 
+After editing a book citation, the new title is shown
+    Create Book Citation
+    Go To  ${DATA_URL}
+    Click  text=Edit
+    Fill Text  css=#book-title  Ohjelmistotuotanto 2
+    Click  text=Update
+    Get Url  ==  ${DATA_URL}
+    Get Text  css=#citation_list  *=  Ohjelmistotuotanto 2
+    ${rows}=  Get Element Count  css=#citation_list tr
+    Should Be Equal As Integers  ${rows}  2
+    Go To  ${RESET_URL}
 *** Keywords ***
 
 Create Book Citation
