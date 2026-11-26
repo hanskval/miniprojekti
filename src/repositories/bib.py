@@ -1,19 +1,17 @@
 def safe_bib(text):
     unsafe_chars = {
-        '\\': r'\\textbackslash{}',
-        '{': r'\\{',
-        '}': r'\\}',
-        '$': r'\\$',
-        '&': r'\\&',
-        '%': r'\\%',
-        '#': r'\\#',
-        '_': r'\\_',
-        '^': r'\\textasciicircum{}',
-        '~': r'\\textasciitilde{}',
+        '\\': r'\textbackslash{}',
+        '{': r'\{',
+        '}': r'\}',
+        '$': r'\$',
+        '&': r'\&',
+        '%': r'\%',
+        '#': r'\#',
+        '_': r'\_',
+        '^': r'\textasciicircum{}',
+        '~': r'\textasciitilde{}',
     }
-    for unsafe, safe in unsafe_chars.items():
-        text = text.replace(unsafe, safe)
-    return text
+    return "".join(unsafe_chars.get(char, char) for char in text)
 
 def bibfile(entries):
     output = []

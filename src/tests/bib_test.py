@@ -27,3 +27,11 @@ class TestBib(unittest.TestCase):
         result = bibfile([entry])[0]
         self.assertNotIn("id =", result)
         self.assertNotIn("type =", result)
+
+    def test_special_characters_are_escaped(self):
+        self.assertEqual(safe_bib("A & B"), r"A \& B")
+        self.assertEqual(safe_bib("50%"), r"50\%")
+        self.assertEqual(safe_bib("my_file"), r"my\_file")
+
+    def test_backslash_is_escaped_once(self):
+        self.assertEqual(safe_bib("a\\b"), r"a\textbackslash{}b")
