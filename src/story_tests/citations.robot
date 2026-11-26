@@ -41,7 +41,7 @@ After adding an article citation, its fields are shown when filtered
 Citation table has correct headers and four columns
     Go To  ${DATA_URL}
     ${columns}=  Get Element Count  css=#citation_list tr:first-child th
-    Should Be Equal As Integers  ${columns}  4
+    Should Be Equal As Integers  ${columns}  5
     Table Should Have Headers
     Go To  ${RESET_URL}
 
