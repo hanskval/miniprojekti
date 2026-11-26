@@ -93,3 +93,10 @@ hyvää:
 - We already have an idea of the plan to come and delegate features very early now, so the project is clear
 - Try to not have crunch days - Wednesday of sprint 2 was a stressful crunch day
 - Perhaps increase communication on Discord when features are being added or work is being done or modified.
+
+## Delegation:
+- Valtsu - all tests and including robot tests / user story
+- Sofia and Juju - do all 11 remaining citation implementations
+- Isabelle - remove citations and figure out backlog
+- Michael - DOI and other feature implementation
+
