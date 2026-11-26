@@ -60,6 +60,16 @@ Home button exists
     Get Element Count  id=home_button  ==  1
     Go To  ${RESET_URL}
 
+After adding an inproceedings citation, its fields are shown when filtered
+    Create Inproceedings Citation
+    Go To  ${DATA_URL}?type=inproceedings
+    Get Text  body  *=  A Conference Paper
+    Get Text  body  *=  Proceedings of ICSE 2026
+    Get Text  css=#citation_list tr:first-child th:nth-child(4)  ==  Booktitle
+    ${rows}=  Get Element Count  css=#citation_list tr
+    Should Be Equal As Integers  ${rows}  2
+    Go To  ${RESET_URL}
+
 *** Keywords ***
 
 Create Book Citation
@@ -89,3 +99,13 @@ Table Should Have Headers
     Get Text  css=#citation_list tr:first-child th:nth-child(2)  ==  Author
     Get Text  css=#citation_list tr:first-child th:nth-child(3)  ==  Year
     Get Text  css=#citation_list tr:first-child th:nth-child(4)  ==  Publisher
+    
+Create Inproceedings Citation
+    Go To  ${HOME_URL}
+    Click  text=Create new citation
+    Click  text=Inproceedings citation
+    Fill Text  css=#inproceedings-author     A Researcher
+    Fill Text  css=#inproceedings-title      A Conference Paper
+    Fill Text  css=#inproceedings-year       2026
+    Fill Text  css=#inproceedings-booktitle  Proceedings of ICSE 2026
+    Click  css=details[open] button
