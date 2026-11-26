@@ -9,8 +9,8 @@
 
 ## Definition of Done
 User story on valmis, kun:
-- hyväksymiskriteerit on testattu Robot Framework -testeillä
+- hyväksymiskriteerit on testattu Robot-testeillä
 - koodilla on yksikkötestit
 - Pylint antaa 10/10
 - CI on vihreä ja muutos on mainissa
-- ominaisuus toimii OKD:llä
+- kaikki toimii OKD:llä
