@@ -14,3 +14,6 @@ User story on valmis, kun:
 - Pylint antaa 10/10
 - CI on vihreä ja muutos on mainissa
 - kaikki toimii OKD:llä
+
+## Lisenssi
+MIT, katso [LICENSE](LICENSE).
