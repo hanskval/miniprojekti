@@ -5,7 +5,11 @@ body %}
 
 <ul>
   {% for c in citations %}
-  <li>{{ c.author }}: {{ c.title }} ({{ c.year }}), {{ c.publisher }}</li>
+  <li>
+    {% for name in columns %}
+      {% if not loop.first %} / {% endif %}{{ c[name] }}
+    {% endfor %}
+  </li>
   {% endfor %}
 </ul>
 
@@ -15,6 +19,12 @@ body %}
 <p>
   <div>
     <a href="/new_citation">Create new citation</a>
+  </div>
+</p>
+
+<p>
+  <div>
+    <a href="/citation_list">Citation list </a>
   </div>
 </p>
 

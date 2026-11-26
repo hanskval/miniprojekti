@@ -6,8 +6,9 @@ ${SERVER}     localhost:5001
 ${DELAY}      500ms
 ${HOME_URL}   http://${SERVER}
 ${RESET_URL}  http://${SERVER}/reset_db
+${DATA_URL}   http://${SERVER}/citation_list
 ${BROWSER}    chromium
-${HEADLESS}   false
+${HEADLESS}   true
 
 *** Keywords ***
 Open And Configure Browser

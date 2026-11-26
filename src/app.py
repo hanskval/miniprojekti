@@ -1,19 +1,19 @@
-from flask import Response, redirect, render_template, request, jsonify, flash
-from repositories import bib
-from db_helper import reset_db
-from repositories.todo_repository import get_todos, create_todo, set_done
+from flask import Response, redirect, render_template, request, jsonify, flash, abort
 from config import app, test_env
-from util import validate_todo
 from db_helper import reset_db, init_db_if_needed
+from repositories import bib, citations
 
-from repositories import citations
 
 with app.app_context():
     init_db_if_needed()
 
 @app.route("/")
 def index():
-    return render_template("index.html", citations=citations.get_citations())
+    return render_template(
+        "index.html",
+        citations=citations.get_citations(),
+        columns=["title", "author", "year", "type"],
+    )
 
 @app.route("/make_bibtex")
 def make_bibtex():
@@ -24,41 +24,107 @@ def make_bibtex():
             mimetype="application/x-bibtex",
             headers={"Content-Disposition": 'attachment; filename="citations.bib"'},
         )
-    
+
+@app.route("/citation_list")
+def citation_list():
+    citation_type = request.args.get("type") or None
+    if citation_type is not None and citation_type not in citations.CITATION_FIELDS:
+        abort(400)
+
+    entries = (
+        citations.get_citations_by_type(citation_type)
+        if citation_type
+        else citations.get_citations()
+    )
+    types = {entry.type for entry in entries}
+    display_types = types or ({citation_type} if citation_type else {"book"})
+    columns = ["title", "author", "year"]
+    if citation_type is None and (
+        len(types) > 1
+        or any(
+            entry_type not in citations.CITATION_FIELDS for entry_type in types
+        )
+    ):
+        columns.insert(0, "type")
+    if "book" in display_types or any(entry.publisher for entry in entries):
+        columns.append("publisher")
+    if "article" in display_types or any(entry.journal for entry in entries):
+        columns.extend(("journal", "volume", "issue", "pages"))
+    if "inproceedings" in display_types:
+        columns.append("booktitle")
+    for optional_field in (
+        "editor", "volume", "issue", "series", "pages", "address",
+        "organization", "month", "note"
+    ):
+        if optional_field not in columns and any(
+            getattr(entry, optional_field) for entry in entries
+        ):
+            columns.append(optional_field)
+
+    return render_template(
+        "citation_list.html",
+        citations=entries,
+        columns=columns,
+        citation_type=citation_type,
+    )
+
+@app.route("/make_bib/<int:citation_id>")
+def make_bib(citation_id):
+    citation = citations.get_citation(citation_id)
+    if not citation:
+        return "Citation not found", 404
+
+    entries = bib.bibfile([citation])
+    return Response(
+            "\n\n".join(entries) + ("\n" if entries else ""),
+            mimetype="application/x-bibtex",
+            headers={"Content-Disposition": 'attachment; filename="citations.bib"'},
+        )
+    ## if not citation:
+    ##    return "Citation not found", 404
+    ## return render_template("citation.html", citation=citation)
 
 @app.route("/new_citation")
 def new():
-    return render_template("new_citation.html")
-
-@app.route("/create_book_citation", methods=["POST"])
-def book_citation_creation():
-    fields = ("type", "author", "title", "year", "publisher")
-    citation = {field: request.form.get(field, "").strip() for field in fields}
-
-    if not all(citation.values()):
-        flash("All fields are required.")
-        return redirect("/new_citation")
-
-    if citation["type"] != "book":
-        flash("Unsupported citation type.")
-        return redirect("/new_citation")
-
-    try:
-        year = int(citation["year"])
-    except ValueError:
-        flash("Year must be a number.")
-        return redirect("/new_citation")
-
-    citations.create_book_citation(
-        citation["type"],
-        citation["author"],
-        citation["title"],
-        year,
-        citation["publisher"],
+    return render_template(
+        "new_citation.html",
+        # columns=citations.get_column_metadata(),
     )
-    return redirect("/") # tää myöhemmi nii et siirtää siihe kirjaan tai listaan yms citationiin eikä etusivulle
 
+@app.route("/create_citation", methods=["POST"])
+def create_citation():
+    citation = request.form.to_dict(flat=True)
+    try:
+        citations.create_citation(citation)
+    except ValueError as exc:
+        flash(str(exc))
+        return redirect("/new_citation")
+    return redirect("/citation_list")
 
+@app.route("/reset_db")
+def reset_db_route():
+    reset_db()
+    return jsonify({ 'message': "db reset" })
+
+@app.route("/edit_citation/<int:citation_id>", methods=["GET", "POST"])
+def edit_citation(citation_id):
+    citation = citations.get_citation(citation_id)
+    if not citation:
+        flash("Citation not found")
+        return redirect("/citation_list")
+
+    if request.method == "POST":
+        updated_data = request.form.to_dict(flat=True)
+        try:
+            citations.update_citation(citation_id, updated_data)
+        except ValueError as exc:
+            flash(str(exc))
+            return redirect(f"/edit_citation/{citation_id}")
+        return redirect("/citation_list")
+
+    return render_template(
+        "edit_citation.html",
+        citation=citation,)
 
 # testausta varten oleva reitti
 if test_env:

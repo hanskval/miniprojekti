@@ -1,0 +1,66 @@
+{% extends "layout.html" %} {% block title %} Citation {% endblock %} {% block
+body %}
+
+<h2>Citation list</h2>
+
+<nav aria-label="Filter citations by type">
+    <a href="{{ url_for('citation_list') }}"
+       {% if not citation_type %}aria-current="page"{% endif %}>All</a>
+    <a href="{{ url_for('citation_list', type='book') }}"
+       {% if citation_type == "book" %}aria-current="page"{% endif %}>Books</a>
+    <a href="{{ url_for('citation_list', type='article') }}"
+       {% if citation_type == "article" %}aria-current="page"{% endif %}>Articles</a>
+    <a href="{{ url_for('citation_list', type='inproceedings') }}"
+       {% if citation_type == "inproceedings" %}aria-current="page"{% endif %}>Inproceedings</a>
+</nav>
+
+<table id="citation_list">
+    <caption>Click the citation title to download a citation in BibTeX format separately.</caption>
+    <tr>
+        {% for name in columns %}
+        <th>{{ name|title }}</th>
+        {% endfor %}
+        <th>Actions</th>
+    </tr>
+    {% for c in citations %}
+    <tr>
+        {% for name in columns %}
+        <td>
+            {% if name == "title" %}
+            <a href="{{ url_for('make_bib', citation_id=c.id) }}">{{ c[name] }}</a>
+            {% else %}
+            {{ c[name] if c[name] is not none else "-" }}
+            {% endif %}
+        </td>
+        {% endfor %}
+        <td>
+            <a href="{{ url_for('edit_citation', citation_id=c.id) }}">Edit</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<p>
+  <div id="new_citation_button">
+    <a href="/new_citation">Create new citation</a>
+  </div>
+</p>
+
+<p>
+  <div id="download_all_citations_button">
+    <a href="{{ url_for('make_bibtex') }}">Download all citations</a>
+  </div>
+</p>
+
+<p>
+  <div id="home_button">
+    <a href="/">Return home</a>
+  </div>
+</p>
+
+<p>
+  <div id="reset_button">
+    <a href="/reset_db">Reset database</a>
+  </div>
+</p>
+{% endblock %}

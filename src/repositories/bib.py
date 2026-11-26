@@ -1,7 +1,3 @@
-from repositories import citations
-from flask import Response
-from config import app
-
 def safe_bib(text):
     unsafe_chars = {
         '\\': r'\\textbackslash{}',
@@ -20,13 +16,24 @@ def safe_bib(text):
     return text
 
 def bibfile(entries):
-    return [
-        f"@{citation.type}{{citation{citation.id},\n"
-        f"  author = {{{safe_bib(citation.author)}}},\n"
-        f"  title = {{{safe_bib(citation.title)}}},\n"
-        f"  year = {{{citation.year}}},\n"
-        f"  publisher = {{{safe_bib(citation.publisher)}}}\n"
-        f"}}"
-        for citation in entries
-    ]
-    
+    output = []
+    for citation in entries:
+        values = citation._asdict() if hasattr(citation, "_asdict") else citation
+        citation_type = values["type"] if "type" in values else "misc"
+        fields = []
+        for name in values.keys():
+            if name in ("id", "type"):
+                continue
+            value = values[name]
+            if value is not None and str(value).strip():
+                bib_name = "number" if name == "issue" else name
+                fields.append(
+                    f"  {bib_name} = {{{safe_bib(str(value))}}}"
+                )
+        body = ",\n".join(fields)
+        output.append(
+            f"@{citation_type}{{citation{values['id']},\n"
+            f"{body}\n"
+            f"}}"
+        )
+    return output
