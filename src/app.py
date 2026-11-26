@@ -106,7 +106,25 @@ def reset_db_route():
     reset_db()
     return jsonify({ 'message': "db reset" })
 
+@app.route("/edit_citation/<int:citation_id>", methods=["GET", "POST"])
+def edit_citation(citation_id):
+    citation = citations.get_citation(citation_id)
+    if not citation:
+        flash("Citation not found")
+        return redirect("/citation_list")
 
+    if request.method == "POST":
+        updated_data = request.form.to_dict(flat=True)
+        try:
+            citations.update_citation(citation_id, updated_data)
+        except ValueError as exc:
+            flash(str(exc))
+            return redirect(f"/edit_citation/{citation_id}")
+        return redirect("/citation_list")
+
+    return render_template(
+        "edit_citation.html",
+        citation=citation,)
 
 # testausta varten oleva reitti
 if test_env:

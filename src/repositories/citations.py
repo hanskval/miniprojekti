@@ -113,3 +113,49 @@ def get_citation(citation_id):
         " FROM citations WHERE id = :id"
     )
     return db.session.execute(sql, {"id": citation_id}).fetchone()
+
+def update_citation(citation_id, data):
+    existing_citation = get_citation(citation_id)
+    if not existing_citation:
+        raise ValueError("Citation not found.")
+
+    citation_type = str(data.get("type", "")).strip().lower()
+    if citation_type not in CITATION_FIELDS:
+        raise ValueError("Citation type must be book, article or inproceedings.")
+
+    optional_fields = OPTIONAL_FIELDS
+    if citation_type == "inproceedings":
+        optional_fields = (*INPROCEEDINGS_OPTIONAL_FIELDS, *OPTIONAL_FIELDS)
+    fields = (*COMMON_FIELDS, *CITATION_FIELDS[citation_type], *optional_fields)
+    unexpected_fields = {
+        name for name, value in data.items()
+        if name not in {"type", *fields} and str(value).strip()
+    }
+    if unexpected_fields:
+        raise ValueError("The submitted fields do not match the citation type.")
+
+    citation = {"type": citation_type}
+    for name in (*COMMON_FIELDS, *CITATION_FIELDS[citation_type]):
+        value = str(data.get(name, "")).strip()
+        if not value:
+            raise ValueError(f"{name} is required.")
+        if name == "year":
+            try:
+                value = int(value)
+            except ValueError as exc:
+                raise ValueError("year must be a number.") from exc
+        citation[name] = value
+
+    for name in optional_fields:
+        value = str(data.get(name, "")).strip()
+        citation[name] = value or None
+
+    set_clause = ", ".join(f'"{name}" = :{name}' for name in citation)
+    sql = text(f"UPDATE citations SET {set_clause} WHERE id = :id")
+
+    try:
+        db.session.execute(sql, {**citation, "id": citation_id})
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
