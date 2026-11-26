@@ -1,7 +1,16 @@
-# Miniprojekti lähdesovellukseen
-Backlog: https://github.com/users/hanskval/projects/1
-Sprint 1: https://github.com/users/hanskval/projects/4/views/2
-OKD-klusteri: https://route-ohjelmistotuotanto-lahiopetus-2026-17.ext.okd-cs-test-0.k8s.cs.helsinki.fi/
+[![CI](https://github.com/hanskval/miniprojekti/actions/workflows/ci.yaml/badge.svg)](https://github.com/hanskval/miniprojekti/actions)
 
-## Valmistelun määrittely - Definition of done
-Sovellus on toimivassa kunnossa ja uudet toiminnot toimivat. Testit menevät läpi ainakin kolme kertaa. 
+- Backlog: https://github.com/users/hanskval/projects/4
+- Sprint 1: https://github.com/users/hanskval/projects/4/views/2
+- CI: https://github.com/hanskval/miniprojekti/actions
+- Sovellus (OKD): https://route-ohjelmistotuotanto-lahiopetus-2026-17.ext.okd-cs-test-0.k8s.cs.helsinki.fi/
+- [Pelisäännöt](pelisaannot.md)
+- [Retrospektiivit](retro.md)
+
+## Definition of Done
+User story on valmis, kun:
+- hyväksymiskriteerit on testattu Robot Framework -testeillä
+- koodilla on yksikkötestit
+- Pylint antaa 10/10
+- CI on vihreä ja muutos on mainissa
+- ominaisuus toimii OKD:llä
